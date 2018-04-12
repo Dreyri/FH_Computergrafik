@@ -203,7 +203,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QOpenGLWidget" name="openGLWidget">
+       <widget class="MyGLWidget" name="openGLWidget">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
           <horstretch>0</horstretch>
@@ -230,6 +230,13 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MyGLWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">myglwidget.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
