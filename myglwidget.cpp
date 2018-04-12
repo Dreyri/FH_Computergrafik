@@ -3,15 +3,51 @@
 #include <iostream>
 
 MyGLWidget::MyGLWidget(QWidget* parent)
-    : QOpenGLWidget(parent), m_fov(45), m_angle(0),
+    : QOpenGLWidget(parent), m_cameraPos(), m_fov(45), m_angle(0),
       m_near(10.0), m_far(1000.0),
       m_rotationA(0), m_rotationB(0), m_rotationC(0)
 {
-
+    setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 }
 
 MyGLWidget::~MyGLWidget()
 { }
+
+void MyGLWidget::keyPressEvent(QKeyEvent* event)
+{
+    float xMovement = 0.0f;
+    float zMovement = 0.0f;
+
+    float increment = 0.2;
+
+    if (event->key() == Qt::Key_W)
+    {
+        zMovement += increment;
+        event->accept();
+    }
+    if (event->key() == Qt::Key_S)
+    {
+        zMovement -= increment;
+        event->accept();
+    }
+    if (event->key() == Qt::Key_A)
+    {
+        xMovement -= increment;
+        event->accept();
+    }
+    if (event->key() == Qt::Key_D)
+    {
+        xMovement += increment;
+        event->accept();
+    }
+
+    QVector3D transformation(xMovement, 0.0f, zMovement);
+
+    m_cameraPos += transformation;
+    std::cout << "Camera Position: (" << m_cameraPos.x() << ", " << m_cameraPos.y() << ", " << m_cameraPos.z() << ")" << std::endl;
+
+}
+
 
 void MyGLWidget::setFOV(int val)
 {

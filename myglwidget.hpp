@@ -3,10 +3,14 @@
 
 #include <QWidget>
 #include <QOpenGLWidget>
+#include <QVector3D>
+#include <QKeyEvent>
 
 class MyGLWidget : public QOpenGLWidget
 {
 private:
+    QVector3D m_cameraPos;
+
     int m_fov;
     int m_angle;
 
@@ -21,6 +25,9 @@ private:
 public:
     MyGLWidget(QWidget* parent = nullptr);
     virtual ~MyGLWidget();
+
+protected:
+    virtual void keyPressEvent(QKeyEvent* event);
 
 public slots:
     void setFOV(int val);

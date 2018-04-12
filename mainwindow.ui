@@ -34,6 +34,9 @@
            <layout class="QFormLayout" name="rotations">
             <item row="1" column="0">
              <widget class="QSlider" name="hsRotationA">
+              <property name="maximum">
+               <number>360</number>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -48,6 +51,9 @@
             </item>
             <item row="2" column="0">
              <widget class="QSlider" name="hsRotationB">
+              <property name="maximum">
+               <number>360</number>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -62,6 +68,9 @@
             </item>
             <item row="3" column="0">
              <widget class="QSlider" name="hsRotationC">
+              <property name="maximum">
+               <number>360</number>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -108,7 +117,11 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QDoubleSpinBox" name="dsbNear"/>
+             <widget class="QDoubleSpinBox" name="dsbNear">
+              <property name="maximum">
+               <double>5000.000000000000000</double>
+              </property>
+             </widget>
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="labelNear">
@@ -118,7 +131,17 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QDoubleSpinBox" name="dsbFar"/>
+             <widget class="QDoubleSpinBox" name="dsbFar">
+              <property name="minimum">
+               <double>0.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>5000.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>1000.000000000000000</double>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -246,12 +269,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>488</y>
+     <x>122</x>
+     <y>508</y>
     </hint>
     <hint type="destinationlabel">
-     <x>847</x>
-     <y>434</y>
+     <x>158</x>
+     <y>454</y>
     </hint>
    </hints>
   </connection>
@@ -262,12 +285,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>307</x>
-     <y>475</y>
+     <x>46</x>
+     <y>495</y>
     </hint>
     <hint type="destinationlabel">
-     <x>237</x>
-     <y>424</y>
+     <x>81</x>
+     <y>444</y>
     </hint>
    </hints>
   </connection>
@@ -278,12 +301,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>189</x>
-     <y>437</y>
+     <x>81</x>
+     <y>457</y>
     </hint>
     <hint type="destinationlabel">
-     <x>304</x>
-     <y>514</y>
+     <x>43</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -294,12 +317,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>775</x>
-     <y>433</y>
+     <x>158</x>
+     <y>453</y>
     </hint>
     <hint type="destinationlabel">
-     <x>903</x>
-     <y>513</y>
+     <x>121</x>
+     <y>533</y>
     </hint>
    </hints>
   </connection>
