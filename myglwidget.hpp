@@ -8,7 +8,10 @@
 
 class MyGLWidget : public QOpenGLWidget
 {
+    Q_OBJECT
 private:
+    static constexpr double MAX_NEAR_FAR_DELTA = 2.0;
+
     QVector3D m_cameraPos;
 
     int m_fov;
@@ -27,7 +30,7 @@ public:
     virtual ~MyGLWidget();
 
 protected:
-    virtual void keyPressEvent(QKeyEvent* event);
+    virtual void keyPressEvent(QKeyEvent* event) override;
 
 public slots:
     void setFOV(int val);
@@ -38,6 +41,11 @@ public slots:
     void setRotationA(int val);
     void setRotationB(int val);
     void setRotationC(int val);
+
+signals:
+    void nearChanged(double);
+    void farChanged(double);
+
 };
 
 #endif // MYGLWIDGET_HPP

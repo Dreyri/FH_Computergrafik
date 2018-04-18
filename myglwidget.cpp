@@ -1,6 +1,7 @@
 #include "myglwidget.hpp"
 
 #include <iostream>
+#include <QtDebug>
 
 MyGLWidget::MyGLWidget(QWidget* parent)
     : QOpenGLWidget(parent), m_cameraPos(), m_fov(45), m_angle(0),
@@ -20,79 +21,98 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
 
     float increment = 0.2;
 
-    if (event->key() == Qt::Key_W)
+    switch (event->key())
     {
+    case Qt::Key_W:
+    case Qt::Key_Up:
         zMovement += increment;
         event->accept();
-    }
-    if (event->key() == Qt::Key_S)
-    {
+        break;
+    case Qt::Key_S:
+    case Qt::Key_Down:
         zMovement -= increment;
         event->accept();
-    }
-    if (event->key() == Qt::Key_A)
-    {
+        break;
+    case Qt::Key_A:
+    case Qt::Key_Left:
         xMovement -= increment;
         event->accept();
-    }
-    if (event->key() == Qt::Key_D)
-    {
+        break;
+    case Qt::Key_D:
+    case Qt::Key_Right:
         xMovement += increment;
         event->accept();
+        break;
+    default:
+        QOpenGLWidget::keyPressEvent(event);
+        break;
     }
 
     QVector3D transformation(xMovement, 0.0f, zMovement);
 
     m_cameraPos += transformation;
-    std::cout << "Camera Position: (" << m_cameraPos.x() << ", " << m_cameraPos.y() << ", " << m_cameraPos.z() << ")" << std::endl;
-
+    qDebug() << "Camera position: " << m_cameraPos;
 }
 
 
 void MyGLWidget::setFOV(int val)
 {
     m_fov = val;
-    std::cout << "FOV changed: " << m_fov << std::endl;
+    qDebug() << "FOV changed: " << m_fov;
 }
 
 void MyGLWidget::setAngle(int angle)
 {
     m_angle = angle;
-    std::cout << "Angle changed: " << m_angle << std::endl;
+    qDebug() << "Angle changed: " << m_angle;
 }
 
 void MyGLWidget::setProjectionMode(bool perspective)
 {
     m_perspective = perspective;
-    std::cout << "Perspective " << (perspective ? "enabled" : "disabled") << std::endl;
+    qDebug() << "Perspective " << (perspective ? "enabled" : "disabled");
 }
 
 void MyGLWidget::setNear(double val)
 {
+    if (val > m_far - MAX_NEAR_FAR_DELTA)
+    {
+        farChanged(val + MAX_NEAR_FAR_DELTA);
+    }
+
     m_near = val;
-    std::cout << "Near changed: " << m_near << std::endl;
+
+    qDebug() << "Near changed: " << m_near;
+    nearChanged(val);
 }
 
 void MyGLWidget::setFar(double val)
 {
+    if (val < m_near + MAX_NEAR_FAR_DELTA)
+    {
+        nearChanged(val - MAX_NEAR_FAR_DELTA);
+    }
+
     m_far = val;
-    std::cout << "Far changed: " << m_far << std::endl;
+
+    qDebug() << "Far changed: " << m_far;
+    farChanged(val);
 }
 
 void MyGLWidget::setRotationA(int val)
 {
     m_rotationA = val;
-    std::cout << "rotationA changed: " << m_rotationA << std::endl;
+    qDebug() << "rotationA changed: " << m_rotationA;
 }
 
 void MyGLWidget::setRotationB(int val)
 {
     m_rotationB = val;
-    std::cout << "rotationB changed: " << m_rotationB << std::endl;
+    qDebug() << "rotationB changed: " << m_rotationB;
 }
 
 void MyGLWidget::setRotationC(int val)
 {
     m_rotationC = val;
-    std::cout << "rotationC changed: " << m_rotationC << std::endl;
+    qDebug() << "rotationC changed: " << m_rotationC;
 }

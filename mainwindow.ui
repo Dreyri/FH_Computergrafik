@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>978</width>
+    <width>1064</width>
     <height>620</height>
    </rect>
   </property>
@@ -14,6 +14,12 @@
    <string>Praktikum 1</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="autoFillBackground">
     <bool>true</bool>
    </property>
@@ -24,219 +30,227 @@
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="vbControls">
-        <property name="sizeConstraint">
-         <enum>QLayout::SetMinimumSize</enum>
+       <widget class="QGroupBox" name="vbControls_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <item>
-         <layout class="QVBoxLayout" name="gbRotation">
-          <item>
-           <layout class="QFormLayout" name="rotations">
-            <item row="1" column="0">
-             <widget class="QSlider" name="hsRotationA">
-              <property name="maximum">
-               <number>360</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="labelA">
-              <property name="text">
-               <string>Ring A</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QSlider" name="hsRotationB">
-              <property name="maximum">
-               <number>360</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="labelB">
-              <property name="text">
-               <string>Ring B</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QSlider" name="hsRotationC">
-              <property name="maximum">
-               <number>360</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QLabel" name="labelC">
-              <property name="text">
-               <string>Ring C</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="gbProjection">
-          <item>
-           <widget class="QRadioButton" name="rbPerspective">
-            <property name="text">
-             <string>Perspective</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="rbOrthogonal">
-            <property name="text">
-             <string>Orthogonal</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="gbClipping">
-          <item>
-           <layout class="QFormLayout" name="clipping">
-            <item row="0" column="0">
-             <widget class="QLabel" name="labelFar">
-              <property name="text">
-               <string>Far</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QDoubleSpinBox" name="dsbNear">
-              <property name="maximum">
-               <double>5000.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="labelNear">
-              <property name="text">
-               <string>Near</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QDoubleSpinBox" name="dsbFar">
-              <property name="minimum">
-               <double>0.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>5000.000000000000000</double>
-              </property>
-              <property name="value">
-               <double>1000.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="sliders">
-          <item>
-           <layout class="QVBoxLayout" name="slider2">
-            <item>
-             <widget class="QLabel" name="labelAngle">
-              <property name="text">
-               <string>Angle</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spAngle">
-              <property name="maximum">
-               <number>360</number>
-              </property>
-             </widget>
-            </item>
-            <item alignment="Qt::AlignHCenter">
-             <widget class="QSlider" name="vsAngle">
-              <property name="maximum">
-               <number>360</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="slider1">
-            <item>
-             <widget class="QLabel" name="labelFOV">
-              <property name="text">
-               <string>FOV</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spFOV">
-              <property name="minimum">
-               <number>45</number>
-              </property>
-              <property name="maximum">
-               <number>180</number>
-              </property>
-             </widget>
-            </item>
-            <item alignment="Qt::AlignHCenter">
-             <widget class="QSlider" name="vsFOV">
-              <property name="minimum">
-               <number>45</number>
-              </property>
-              <property name="maximum">
-               <number>180</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QFormLayout" name="flControlButtons"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="rbReset">
-          <property name="text">
-           <string>Reset</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+        <layout class="QVBoxLayout" name="vbControls">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMinimumSize</enum>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" name="gbRotation">
+           <item>
+            <layout class="QFormLayout" name="rotations">
+             <item row="1" column="0">
+              <widget class="QSlider" name="hsRotationA">
+               <property name="maximum">
+                <number>360</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="labelA">
+               <property name="text">
+                <string>Ring A</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QSlider" name="hsRotationB">
+               <property name="maximum">
+                <number>360</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="labelB">
+               <property name="text">
+                <string>Ring B</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QSlider" name="hsRotationC">
+               <property name="maximum">
+                <number>360</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLabel" name="labelC">
+               <property name="text">
+                <string>Ring C</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="gbProjection">
+           <item>
+            <widget class="QRadioButton" name="rbPerspective">
+             <property name="text">
+              <string>Perspective</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="rbOrthogonal">
+             <property name="text">
+              <string>Orthogonal</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="gbClipping">
+           <item>
+            <layout class="QFormLayout" name="clipping">
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="dsbNear">
+               <property name="maximum">
+                <double>5000.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="dsbFar">
+               <property name="minimum">
+                <double>0.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>5000.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>1000.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="labelNear">
+               <property name="text">
+                <string>Near</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="labelFar">
+               <property name="text">
+                <string>Far</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="sliders">
+           <item>
+            <layout class="QVBoxLayout" name="slider2">
+             <item>
+              <widget class="QLabel" name="labelAngle">
+               <property name="text">
+                <string>Angle</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="spAngle">
+               <property name="maximum">
+                <number>360</number>
+               </property>
+              </widget>
+             </item>
+             <item alignment="Qt::AlignHCenter">
+              <widget class="QSlider" name="vsAngle">
+               <property name="maximum">
+                <number>360</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="slider1">
+             <item>
+              <widget class="QLabel" name="labelFOV">
+               <property name="text">
+                <string>FOV</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="spFOV">
+               <property name="minimum">
+                <number>45</number>
+               </property>
+               <property name="maximum">
+                <number>180</number>
+               </property>
+              </widget>
+             </item>
+             <item alignment="Qt::AlignHCenter">
+              <widget class="QSlider" name="vsFOV">
+               <property name="minimum">
+                <number>45</number>
+               </property>
+               <property name="maximum">
+                <number>180</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QFormLayout" name="flControlButtons"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="rbReset">
+           <property name="text">
+            <string>Reset</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </item>
       <item>
        <widget class="MyGLWidget" name="openGLWidget">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>800</width>
-          <height>600</height>
+          <width>480</width>
+          <height>360</height>
          </size>
         </property>
         <property name="sizeIncrement">
@@ -269,44 +283,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>508</y>
+     <x>200</x>
+     <y>505</y>
     </hint>
     <hint type="destinationlabel">
-     <x>158</x>
-     <y>454</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>vsAngle</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spAngle</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>46</x>
-     <y>495</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>81</x>
-     <y>444</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spAngle</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>vsAngle</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>81</x>
-     <y>457</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>43</x>
-     <y>534</y>
+     <x>172</x>
+     <y>452</y>
     </hint>
    </hints>
   </connection>
@@ -317,12 +299,44 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>158</x>
-     <y>453</y>
+     <x>206</x>
+     <y>459</y>
     </hint>
     <hint type="destinationlabel">
-     <x>121</x>
-     <y>533</y>
+     <x>209</x>
+     <y>507</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>vsAngle</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spAngle</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>498</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>52</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spAngle</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>vsAngle</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>95</x>
+     <y>462</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>88</x>
+     <y>539</y>
     </hint>
    </hints>
   </connection>
