@@ -2,17 +2,23 @@
 #define MYGLWIDGET_HPP
 
 #include <QWidget>
+#include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLWidget>
 #include <QVector3D>
 #include <QKeyEvent>
+#include <QOpenGLShader>
 
-class MyGLWidget : public QOpenGLWidget
+class MyGLWidget : public QOpenGLWidget, QOpenGLFunctions_3_3_Core
 {
     Q_OBJECT
 private:
     static constexpr double MAX_NEAR_FAR_DELTA = 2.0;
 
     QVector3D m_cameraPos;
+    QOpenGLShaderProgram m_shaderprog;
+
+    GLuint m_vbo;
+    GLuint m_vao;
 
     int m_fov;
     int m_angle;
@@ -28,6 +34,10 @@ private:
 public:
     MyGLWidget(QWidget* parent = nullptr);
     virtual ~MyGLWidget();
+
+    virtual void initializeGL() override;
+    virtual void resizeGL(int w, int h) override;
+    virtual void paintGL() override;
 
 protected:
     virtual void keyPressEvent(QKeyEvent* event) override;

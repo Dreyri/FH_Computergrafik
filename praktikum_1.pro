@@ -26,11 +26,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    myglwidget.cpp
+    myglwidget.cpp \
+    buffer.cpp \
+    vertex_array_object.cpp
 
 HEADERS += \
         mainwindow.hpp \
-    myglwidget.hpp
+    myglwidget.hpp \
+    vertex.hpp \
+    buffer.hpp \
+    vertex_array_object.hpp
 
 FORMS += \
         mainwindow.ui
+
+RESOURCES += \
+    shaders.qrc
