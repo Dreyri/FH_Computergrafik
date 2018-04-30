@@ -16,9 +16,13 @@ private:
 
     QVector3D m_cameraPos;
     QOpenGLShaderProgram m_shaderprog;
+    QOpenGLShaderProgram m_shaderprog2;
 
     GLuint m_vbo;
     GLuint m_vao;
+    GLuint m_ibo;
+
+    GLuint m_texture;
 
     int m_fov;
     int m_angle;

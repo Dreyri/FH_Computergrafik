@@ -17,8 +17,12 @@ struct attribute_description
 
 struct vertex
 {
-  GLfloat position[2];
-  GLfloat color[3];
+  QVector2D position;
+  QVector3D color;
+  QVector2D texcoords;
+
+  vertex(const QVector2D& pos, const QVector3D& col, const QVector2D& tex)
+      : position(pos), color(col), texcoords(tex) {}
 
   static std::vector<attribute_description> vertex_description()
   {
@@ -38,7 +42,15 @@ struct vertex
     color_description.stride = sizeof(vertex);
     color_description.offset = offsetof(vertex, color);
 
-    return {position_description, color_description};
+    attribute_description texcoord_description = {};
+    texcoord_description.location = 2;
+    texcoord_description.size = sizeof(texcoords) / sizeof(GLfloat);
+    texcoord_description.type = GL_FLOAT;
+    texcoord_description.normalized = GL_FALSE;
+    texcoord_description.stride = sizeof(vertex);
+    texcoord_description.offset = offsetof(vertex, texcoords);
+
+    return {position_description, color_description, texcoord_description};
   }
 };
 

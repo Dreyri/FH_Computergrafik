@@ -14,7 +14,9 @@ MyGLWidget::MyGLWidget(QWidget* parent)
 
 MyGLWidget::~MyGLWidget()
 {
-    glDeleteBuffers(1, &m_vbo);
+    GLuint buffers[] = {m_vbo, m_ibo};
+    glDeleteTextures(1, &m_texture);
+    glDeleteBuffers(2, buffers);
     glDeleteVertexArrays(1, &m_vao);
 }
 
@@ -22,11 +24,35 @@ void MyGLWidget::initializeGL()
 {
     bool success = initializeOpenGLFunctions();
 
+    QImage img;
+    img.load(":/textures/sample_texture.jpg");
+    Q_ASSERT(!img.isNull());
+
     glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    vertex vertices[] = {{{-0.5f, -0.5f}, {1.f, 0.f, 0.f}}, {{0.5f, -0.5f}, {0.f, 1.f, 0.f}}, {{0.f, 0.5f}, {0.f, 0.f, 1.f}}};
+    //load texture
+
+    glGenTextures(1, &m_texture);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, img.width(), img.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, img.bits());
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+
+    //generate buffers
+
+    vertex vertices[] = {vertex(QVector2D(-0.5f, -0.5f), QVector3D(1.0f, 0.f, 0.f), QVector2D(0.f, 1.f)),
+                         vertex(QVector2D(0.5f, -0.5f), QVector3D(0.f, 1.f, 0.f), QVector2D(1.f, 1.f)),
+                         vertex(QVector2D(0.5f, 0.5f), QVector3D(0.f, 0.f, 1.f), QVector2D(0.5f, 0.f)),
+                         vertex(QVector2D(-0.5f, 0.5f), QVector3D(0.f, 0.f, 0.f), QVector2D(0.f, 0.f))};
+
+    GLuint indices[] = {0, 1, 2,   0, 2, 3};
 
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
@@ -35,28 +61,54 @@ void MyGLWidget::initializeGL()
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    glGenBuffers(1, &m_ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    //bind buffer descriptors
+
     for (const auto& description : vertex::vertex_description())
     {
         glEnableVertexAttribArray(description.location);
-        glVertexAttribPointer(description.location, description.size, description.type, description.normalized, description.stride, nullptr);
+        glVertexAttribPointer(description.location, description.size, description.type, description.normalized, description.stride, reinterpret_cast<GLvoid*>(description.offset));
     }
 
     glBindVertexArray(0);
 
+    //create shaders
+
     m_shaderprog.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/sample.vert");
     m_shaderprog.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/sample.frag");
     Q_ASSERT(m_shaderprog.link());
+
+    m_shaderprog2.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/sample.vert");
+    m_shaderprog2.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/color.frag");
+    Q_ASSERT(m_shaderprog2.link());
 }
 
 void MyGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+    m_shaderprog.bind();
+    m_shaderprog.setUniformValue(2, 1.f);
+    m_shaderprog.setUniformValue(3, 0); //set texture to GL_TEXTURE0
+    m_shaderprog.setUniformValue(4, (static_cast<float>(m_rotationA) / 180.f) - 1.f);
+
+    m_shaderprog2.bind();
+    m_shaderprog2.setUniformValue(2, 1.f);
+
+    //bind textures
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+
+    m_shaderprog2.bind();
+
     glBindVertexArray(m_vao);
-    m_shaderprog.setUniformValue(1, 0.2f);
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 
     m_shaderprog.bind();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, reinterpret_cast<GLvoid*>(sizeof(GLuint) * 3));
 
     update();
 
