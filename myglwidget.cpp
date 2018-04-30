@@ -23,8 +23,10 @@ void MyGLWidget::initializeGL()
     bool success = initializeOpenGLFunctions();
 
     glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    GLfloat vertices[] = {-0.5f, -0.5f, 0.5f, -0.5f, 0.f, 0.5f};
+    vertex vertices[] = {{{-0.5f, -0.5f}, {1.f, 0.f, 0.f}}, {{0.5f, -0.5f}, {0.f, 1.f, 0.f}}, {{0.f, 0.5f}, {0.f, 0.f, 1.f}}};
 
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
@@ -33,12 +35,15 @@ void MyGLWidget::initializeGL()
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat[2]), nullptr);
+    for (const auto& description : vertex::vertex_description())
+    {
+        glEnableVertexAttribArray(description.location);
+        glVertexAttribPointer(description.location, description.size, description.type, description.normalized, description.stride, nullptr);
+    }
 
     glBindVertexArray(0);
 
-    m_shaderprog.addShaderFromSourceCode(QOpenGLShader::Vertex, ":/shaders/sample.vert");
+    m_shaderprog.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/sample.vert");
     m_shaderprog.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/sample.frag");
     Q_ASSERT(m_shaderprog.link());
 }
@@ -47,11 +52,13 @@ void MyGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    vertex coords[] = {
-        {QVector2D(-0.5f, -0.5f)},
-        {QVector2D(0.5f, -0.5f)},
-        {QVector2D(0.0f, 0.5f)}
-    };
+    glBindVertexArray(m_vao);
+    m_shaderprog.setUniformValue(1, 0.2f);
+
+    m_shaderprog.bind();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    update();
 
 }
 
