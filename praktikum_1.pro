@@ -26,15 +26,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    myglwidget.cpp
+    myglwidget.cpp \
+    model.cpp
 
 HEADERS += \
         mainwindow.hpp \
     myglwidget.hpp \
-    vertex.hpp
+    vertex.hpp \
+    modelloader.h \
+    model.hpp
 
 FORMS += \
         mainwindow.ui
 
 RESOURCES += \
     shaders.qrc
+
+win32 {
+    message(Target: win32)
+    LIBS += -L../assimp-mingw32-4.1.0/bin -lassimp
+    INCLUDEPATH += ../assimp-mingw32-4.1.0/include
+} unix {
+    message(Target: unix)
+    CONFIG += link_pkgconfig
+    PKGCONFIG += assimp
+}

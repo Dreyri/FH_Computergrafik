@@ -8,11 +8,21 @@
 #include <QKeyEvent>
 #include <QOpenGLShader>
 
+#include <memory>
+
+#include "model.hpp"
+
 class MyGLWidget : public QOpenGLWidget, QOpenGLFunctions_3_3_Core
 {
     Q_OBJECT
 private:
     static constexpr double MAX_NEAR_FAR_DELTA = 2.0;
+
+    QMatrix4x4 m_rotation_matrix;
+
+    QMatrix4x4 m_projection;
+
+    std::unique_ptr<Model> m_model;
 
     QVector3D m_cameraPos;
     QOpenGLShaderProgram m_shaderprog;

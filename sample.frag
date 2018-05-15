@@ -13,5 +13,6 @@ layout(location = 0) out vec4 frag_color;
 
 void main()
 {
-    frag_color = vec4(texture(u_tex, vec2(v_tex_coords.x + u_texcoord_offset, v_tex_coords.y + u_texcoord_offset)).rgb, u_alpha);
+    vec2 adjusted_tex_coords = vec2(v_tex_coords.x + u_texcoord_offset, v_tex_coords.y + u_texcoord_offset);
+    frag_color = vec4(texture(u_tex, adjusted_tex_coords).rgb, u_alpha);
 }

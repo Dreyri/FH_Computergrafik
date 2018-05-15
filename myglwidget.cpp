@@ -24,6 +24,12 @@ void MyGLWidget::initializeGL()
 {
     bool success = initializeOpenGLFunctions();
 
+    // enable face culling
+    glEnable(GL_CULL_FACE);
+    //setup rotation matrix
+    QVector3D axis(0.f, 1.f, 0.f);
+    m_rotation_matrix.rotate(45.f, axis);
+
     QImage img;
     img.load(":/textures/sample_texture.jpg");
     Q_ASSERT(!img.isNull());
@@ -41,7 +47,7 @@ void MyGLWidget::initializeGL()
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 
@@ -77,38 +83,41 @@ void MyGLWidget::initializeGL()
 
     //create shaders
 
-    m_shaderprog.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/sample.vert");
+    m_shaderprog.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/rotation.vert");
     m_shaderprog.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/sample.frag");
     Q_ASSERT(m_shaderprog.link());
 
-    m_shaderprog2.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/sample.vert");
+    m_shaderprog2.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/rotation.vert");
     m_shaderprog2.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/color.frag");
     Q_ASSERT(m_shaderprog2.link());
+
+    // load model
+    m_model = std::make_unique<Model>(":/models/gimbal.obj");
 }
 
 void MyGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    m_shaderprog.bind();
-    m_shaderprog.setUniformValue(2, 1.f);
-    m_shaderprog.setUniformValue(3, 0); //set texture to GL_TEXTURE0
-    m_shaderprog.setUniformValue(4, (static_cast<float>(m_rotationA) / 180.f) - 1.f);
-
-    m_shaderprog2.bind();
-    m_shaderprog2.setUniformValue(2, 1.f);
-
     //bind textures
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_texture);
 
     m_shaderprog2.bind();
+    m_shaderprog2.setUniformValue(0, m_rotation_matrix);
+    m_shaderprog2.setUniformValue(2, 1.f);
 
     glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 
     m_shaderprog.bind();
+    m_shaderprog.setUniformValue(0, m_rotation_matrix);
+    m_shaderprog.setUniformValue(2, 1.f); //alpha
+    m_shaderprog.setUniformValue(3, 0); //set texture to GL_TEXTURE0
+    m_shaderprog.setUniformValue(4, (static_cast<float>(m_rotationA) / 180.f) - 1.f);
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, reinterpret_cast<GLvoid*>(sizeof(GLuint) * 3));
+
+    m_model->render(GL_TRIANGLES);
 
     update();
 
