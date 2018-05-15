@@ -18,21 +18,18 @@ class MyGLWidget : public QOpenGLWidget, QOpenGLFunctions_3_3_Core
 private:
     static constexpr double MAX_NEAR_FAR_DELTA = 2.0;
 
-    QMatrix4x4 m_rotation_matrix;
-
     QMatrix4x4 m_projection;
+    QMatrix4x4 m_view = QMatrix4x4(0.f, 0.f,0.f, 0.f,0.f, 0.f,0.f, 0.f,0.f, 0.f,0.f, 0.f,0.f, 0.f,0.f, 0.f);
 
-    std::unique_ptr<Model> m_model;
+    std::unique_ptr<Model> m_gimbal_a;
+    std::unique_ptr<Model> m_gimbal_b;
+    std::unique_ptr<Model> m_gimbal_c;
 
-    QVector3D m_cameraPos;
-    QOpenGLShaderProgram m_shaderprog;
-    QOpenGLShaderProgram m_shaderprog2;
+    std::unique_ptr<Model> m_sphere;
 
-    GLuint m_vbo;
-    GLuint m_vao;
-    GLuint m_ibo;
+    QVector3D m_cameraPos{0.0f, 0.0f, -20.0f};
 
-    GLuint m_texture;
+    QOpenGLShaderProgram m_program_p3;
 
     int m_fov;
     int m_angle;
@@ -52,6 +49,8 @@ public:
     virtual void initializeGL() override;
     virtual void resizeGL(int w, int h) override;
     virtual void paintGL() override;
+
+    void setupProjection();
 
 protected:
     virtual void keyPressEvent(QKeyEvent* event) override;

@@ -1,15 +1,18 @@
 #include "model.hpp"
 
+#include <QImage>
+#include <QMatrix4x4>
+
 #include <vector>
 
 #include "vertex.hpp"
 
-Model::Model(const QString& resource_path)
+Model::Model(const QString& model_path, const QString& texture_path)
 {
     initializeOpenGLFunctions();
 
-    if (!m_loader.loadObjectFromFile(resource_path)) {
-        throw std::runtime_error((QString("Failed to load object \"") + resource_path + "\"").toStdString());
+    if (!m_loader.loadObjectFromFile(model_path)) {
+        throw std::runtime_error((QString("Failed to load object \"") + model_path + "\"").toStdString());
     }
 
     glGenVertexArrays(1, &m_vao);
@@ -49,6 +52,22 @@ Model::Model(const QString& resource_path)
     if (error != GL_NO_ERROR) {
         qDebug() << "Error during model loading " << error;
     }
+
+    // load texture
+    QImage img;
+    img.load(texture_path);
+    Q_ASSERT(!img.isNull());
+
+    glGenTextures(1, &m_texture);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, img.width(), img.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, img.bits());
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
 }
 
 Model::~Model()
@@ -64,15 +83,59 @@ Model::~Model()
     if (m_ibo) {
         glDeleteBuffers(1, &m_ibo);
     }
+
+    if (m_texture) {
+        glDeleteTextures(1, &m_texture);
+    }
 }
 
 void Model::render(GLenum mode) {
+    // set up render state
     glBindVertexArray(m_vao);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+
+    // draw indices
     glDrawElements(mode, m_num_indices, GL_UNSIGNED_INT, nullptr);
 
     // flush all errors
     GLenum error{glGetError()};
     if (error != GL_NO_ERROR) {
-        qDebug() << "Error whilst rendering model " << error;
+        qDebug() << "Error whilst rendering model" << error;
     }
 }
+
+void Model::translate(const QVector3D& translation) {
+    m_position += translation;
+}
+
+void Model::scale(const QVector3D& scale) {
+    m_scale.setX(m_scale.x() * scale.x());
+    m_scale.setY(m_scale.y() * scale.y());
+    m_scale.setZ(m_scale.z() * scale.z());
+}
+
+void Model::rotate(float angle, const QVector3D& axis) {
+    QQuaternion q = QQuaternion::fromAxisAndAngle(axis, angle);
+    m_rotation *= q;
+}
+
+void Model::rotate(const QQuaternion& q) {
+    m_rotation *= q;
+}
+
+void Model::set_rotation(float angle, const QVector3D& axis) {
+    m_rotation = QQuaternion::fromAxisAndAngle(axis, angle);
+}
+
+
+QMatrix4x4 Model::transformation() const {
+    // generate matrix
+    QMatrix4x4 transformation;
+    transformation.scale(m_scale);
+    transformation.rotate(m_rotation);
+    transformation.translate(m_position);
+
+    return transformation;
+}
+

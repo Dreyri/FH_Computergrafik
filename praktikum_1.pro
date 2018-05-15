@@ -27,14 +27,16 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     myglwidget.cpp \
-    model.cpp
+    model.cpp \
+    skybox.cpp
 
 HEADERS += \
         mainwindow.hpp \
     myglwidget.hpp \
     vertex.hpp \
     modelloader.h \
-    model.hpp
+    model.hpp \
+    skybox.hpp
 
 FORMS += \
         mainwindow.ui

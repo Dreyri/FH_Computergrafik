@@ -5,127 +5,106 @@
 #include <QtDebug>
 
 MyGLWidget::MyGLWidget(QWidget* parent)
-    : QOpenGLWidget(parent), m_cameraPos(), m_shaderprog(), m_fov(45), m_angle(0),
-      m_near(10.0), m_far(1000.0),
+    : QOpenGLWidget(parent), m_fov(45), m_angle(0),
+      m_near(1.0), m_far(1000.0),
       m_rotationA(0), m_rotationB(0), m_rotationC(0)
 {
     setFocusPolicy(Qt::FocusPolicy::ClickFocus);
+    setupProjection();
 }
 
 MyGLWidget::~MyGLWidget()
 {
-    GLuint buffers[] = {m_vbo, m_ibo};
-    glDeleteTextures(1, &m_texture);
-    glDeleteBuffers(2, buffers);
-    glDeleteVertexArrays(1, &m_vao);
 }
 
 void MyGLWidget::initializeGL()
 {
-    bool success = initializeOpenGLFunctions();
+    [[maybe_unused]] bool success = initializeOpenGLFunctions();
 
     // enable face culling
     glEnable(GL_CULL_FACE);
-    //setup rotation matrix
-    QVector3D axis(0.f, 1.f, 0.f);
-    m_rotation_matrix.rotate(45.f, axis);
-
-    QImage img;
-    img.load(":/textures/sample_texture.jpg");
-    Q_ASSERT(!img.isNull());
 
     glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //load texture
-
-    glGenTextures(1, &m_texture);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, img.width(), img.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, img.bits());
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-
-    //generate buffers
-
-    vertex vertices[] = {vertex(QVector2D(-0.5f, -0.5f), QVector3D(1.0f, 0.f, 0.f), QVector2D(0.f, 1.f)),
-                         vertex(QVector2D(0.5f, -0.5f), QVector3D(0.f, 1.f, 0.f), QVector2D(1.f, 1.f)),
-                         vertex(QVector2D(0.5f, 0.5f), QVector3D(0.f, 0.f, 1.f), QVector2D(0.5f, 0.f)),
-                         vertex(QVector2D(-0.5f, 0.5f), QVector3D(0.f, 0.f, 0.f), QVector2D(0.f, 0.f))};
-
-    GLuint indices[] = {0, 1, 2,   0, 2, 3};
-
-    glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
-
-    glGenBuffers(1, &m_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &m_ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    //bind buffer descriptors
-
-    for (const auto& description : vertex::vertex_description())
-    {
-        glEnableVertexAttribArray(description.location);
-        glVertexAttribPointer(description.location, description.size, description.type, description.normalized, description.stride, reinterpret_cast<GLvoid*>(description.offset));
-    }
-
-    glBindVertexArray(0);
-
-    //create shaders
-
-    m_shaderprog.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/rotation.vert");
-    m_shaderprog.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/sample.frag");
-    Q_ASSERT(m_shaderprog.link());
-
-    m_shaderprog2.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/rotation.vert");
-    m_shaderprog2.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/color.frag");
-    Q_ASSERT(m_shaderprog2.link());
+    // praktikum 3
+    // load shader
+    m_program_p3.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/praktikum3.vert");
+    m_program_p3.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/praktikum3.frag");
+    Q_ASSERT(m_program_p3.link());
 
     // load model
-    m_model = std::make_unique<Model>(":/models/gimbal.obj");
+    m_gimbal_a = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/gimbal_wood.jpg");
+    m_gimbal_b = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/gimbal_wood.jpg");
+    m_gimbal_c = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/gimbal_wood.jpg");
+
+    m_sphere = std::make_unique<Model>(":/models/sphere.obj", ":/textures/sample_texture.jpg");
+
+    // set up transformations
+    m_gimbal_a->scale({3.0f, 3.0f, 3.0f});
+    m_gimbal_b->scale({9.0f, 9.0f, 9.0f});
+    m_gimbal_c->scale({15.0f, 15.0f, 15.0f});
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void MyGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    //bind textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture);
+    QMatrix4x4 sphere_transform;
+    sphere_transform.rotate(m_rotationB, QVector3D(0.0f, 1.0f, 0.0f));
 
-    m_shaderprog2.bind();
-    m_shaderprog2.setUniformValue(0, m_rotation_matrix);
-    m_shaderprog2.setUniformValue(2, 1.f);
+    sphere_transform.rotate(m_angle, QVector3D(0.0f, 0.0f, 1.0f));
+    sphere_transform.translate(0.0f, 11.0f, 0.0f);
 
-    glBindVertexArray(m_vao);
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 
-    m_shaderprog.bind();
-    m_shaderprog.setUniformValue(0, m_rotation_matrix);
-    m_shaderprog.setUniformValue(2, 1.f); //alpha
-    m_shaderprog.setUniformValue(3, 0); //set texture to GL_TEXTURE0
-    m_shaderprog.setUniformValue(4, (static_cast<float>(m_rotationA) / 180.f) - 1.f);
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, reinterpret_cast<GLvoid*>(sizeof(GLuint) * 3));
+    QMatrix4x4 view;
+    view.translate(m_cameraPos);
 
-    m_model->render(GL_TRIANGLES);
+    //praktikum 3
+    Q_ASSERT(m_program_p3.bind());
+    m_program_p3.setUniformValue(3, 0);
+    m_program_p3.setUniformValue(1, view);
+    m_program_p3.setUniformValue(2, m_projection);
+
+    QVector3D axis{0.0f, 1.0f, 0.0f};
+    m_gimbal_a->set_rotation(m_rotationA, axis);
+    auto transform = m_gimbal_a->transformation();
+    m_program_p3.setUniformValue(0, transform);
+    m_gimbal_a->render(GL_TRIANGLES);
+
+    m_gimbal_b->set_rotation(m_rotationB, axis);
+    transform = m_gimbal_b->transformation();
+    m_program_p3.setUniformValue(0, transform);
+    m_gimbal_b->render(GL_TRIANGLES);
+
+    m_gimbal_c->set_rotation(m_rotationC, axis);
+    transform = m_gimbal_c->transformation();
+    m_program_p3.setUniformValue(0, transform);
+    m_gimbal_c->render(GL_TRIANGLES);
+
+    transform = m_sphere->transformation();
+    transform *= sphere_transform;
+    m_program_p3.setUniformValue(0, transform);
+    m_sphere->render(GL_TRIANGLES);
 
     update();
-
 }
 
-void MyGLWidget::resizeGL(int w, int h)
+void MyGLWidget::resizeGL([[maybe_unused]] int w, [[maybe_unused]] int h)
 {
+    setupProjection();
+}
 
+void MyGLWidget::setupProjection() {
+    float aspect_ratio = static_cast<float>(width()) / static_cast<float>(height());
+    QMatrix4x4 projection;
+
+    projection.perspective(m_fov, aspect_ratio, m_near, m_far);
+    m_projection = projection;
+    qDebug() << "projection matrix is now " << m_projection;
 }
 
 void MyGLWidget::keyPressEvent(QKeyEvent* event)
@@ -173,6 +152,7 @@ void MyGLWidget::setFOV(int val)
 {
     m_fov = val;
     qDebug() << "FOV changed: " << m_fov;
+    setupProjection();
 }
 
 void MyGLWidget::setAngle(int angle)
@@ -197,6 +177,7 @@ void MyGLWidget::setNear(double val)
     m_near = val;
 
     qDebug() << "Near changed: " << m_near;
+    setupProjection();
     nearChanged(val);
 }
 
@@ -210,6 +191,7 @@ void MyGLWidget::setFar(double val)
     m_far = val;
 
     qDebug() << "Far changed: " << m_far;
+    setupProjection();
     farChanged(val);
 }
 
