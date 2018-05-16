@@ -76,6 +76,12 @@ void MyGLWidget::paintGL()
     QVector3D axis{0.0f, 1.0f, 0.0f};
     QMatrix4x4 sphere_transform;
 
+    auto elapsed_ms = m_timer.elapsed();
+
+    float sphere_rotation = static_cast<float>(elapsed_ms) / 20.0f;
+    m_sphere->rotate(sphere_rotation, {1.0f, 0.0f, 0.0f});
+
+
     // if auto rotation checkbox clicked
     // this is handled a bit ugly but this praktikum is almost done
     // so maybe clean up for the next one
@@ -125,8 +131,10 @@ void MyGLWidget::paintGL()
     m_program_p3.setUniformValue(0, transform);
     m_gimbal_c->render(GL_TRIANGLES);
 
-    transform = m_sphere->transformation();
-    transform *= sphere_transform;
+    transform = sphere_transform;
+    transform *= m_sphere->transformation();
+    //transform = m_sphere->transformation();
+    //transform *= sphere_transform;
     m_program_p3.setUniformValue(0, transform);
     m_sphere->render(GL_TRIANGLES);
 
