@@ -6,6 +6,8 @@
         <file>rotation.vert</file>
         <file>praktikum3.vert</file>
         <file>praktikum3.frag</file>
+        <file>skybox.vert</file>
+        <file>skybox.frag</file>
     </qresource>
     <qresource prefix="/textures">
         <file>sample_texture.jpg</file>

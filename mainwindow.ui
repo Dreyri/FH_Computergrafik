@@ -101,6 +101,24 @@
           </layout>
          </item>
          <item>
+          <layout class="QHBoxLayout" name="checkBoxes">
+           <item>
+            <widget class="QCheckBox" name="cbAutoRotate">
+             <property name="text">
+              <string>Rotate</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cbCenter">
+             <property name="text">
+              <string>Center</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
           <layout class="QVBoxLayout" name="gbProjection">
            <item>
             <widget class="QRadioButton" name="rbPerspective">

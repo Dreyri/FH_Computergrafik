@@ -7,10 +7,12 @@
 #include <QVector3D>
 #include <QKeyEvent>
 #include <QOpenGLShader>
+#include <QElapsedTimer>
 
 #include <memory>
 
 #include "model.hpp"
+#include "skybox.hpp"
 
 class MyGLWidget : public QOpenGLWidget, QOpenGLFunctions_3_3_Core
 {
@@ -25,16 +27,23 @@ private:
     std::unique_ptr<Model> m_gimbal_b;
     std::unique_ptr<Model> m_gimbal_c;
 
+    std::unique_ptr<Skybox> m_skybox;
+
     std::unique_ptr<Model> m_sphere;
 
     QVector3D m_cameraPos{0.0f, 0.0f, -20.0f};
 
     QOpenGLShaderProgram m_program_p3;
 
+    QElapsedTimer m_timer{};
+
     int m_fov;
     int m_angle;
 
     bool m_perspective;
+
+    bool m_center;
+    bool m_auto_rotate;
 
     double m_near;
     double m_far;
@@ -56,6 +65,8 @@ protected:
     virtual void keyPressEvent(QKeyEvent* event) override;
 
 public slots:
+    void setCenter(bool centerCamera);
+    void setAutoRotate(bool rotate);
     void setFOV(int val);
     void setAngle(int angle);
     void setProjectionMode(bool perspective);

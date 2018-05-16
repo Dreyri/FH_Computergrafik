@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QPushButton>
+#include <QCheckBox>
 #include <QSlider>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -9,6 +10,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    connect(ui->cbCenter, &QCheckBox::clicked, ui->openGLWidget, &MyGLWidget::setCenter);
+    connect(ui->cbAutoRotate, &QCheckBox::clicked, ui->openGLWidget, &MyGLWidget::setAutoRotate);
 
     connect(ui->vsAngle, &QSlider::valueChanged, ui->openGLWidget, &MyGLWidget::setAngle);
     connect(ui->vsFOV, &QSlider::valueChanged, ui->openGLWidget, &MyGLWidget::setFOV);
