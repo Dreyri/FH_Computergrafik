@@ -2,16 +2,25 @@
 
 #include <QImage>
 #include <QMatrix4x4>
+#include <QMatrix3x3>
+
+//  3         0
+
+//  1         2
+
+//  5         7
+
+//  4         6
 
 const GLfloat Skybox::skybox_vertices[] = {
-    1, 1, - 1,
-    - 1, - 1, - 1,
-    1, - 1, - 1,
-    1, 1, - 1,
-    - 1, - 1, 1,
-    - 1, 1, 1,
-    1, - 1, 1,
-    1, 1, 1,
+    -1.f, 1.f, -1.f,
+    -1.f, -1.f, -1.f,
+    1.f, -1.f, -1.f,
+    1.f, 1.f, -1.f,
+    -1.f, -1.f, 1.f,
+    -1.f, 1.f, 1.f,
+    1.f, -1.f, 1.f,
+    1.f, 1.f, 1.f,
 };
 
 const GLuint Skybox::skybox_indices[] = {
@@ -54,6 +63,9 @@ Skybox::Skybox(const QString& px, const QString& nx, const QString& py, const QS
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
@@ -98,6 +110,7 @@ Skybox::~Skybox() {
 void Skybox::render(const QMatrix4x4& projection, QMatrix4x4 view) {
     glDepthMask(GL_FALSE);
 
+    // get rid of translation bit
     view.setColumn(3, QVector4D(0.0f, 0.0f, 0.0f, 1.0f));
     view.scale(10.0f);
 

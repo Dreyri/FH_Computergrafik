@@ -36,9 +36,9 @@ void MyGLWidget::initializeGL()
     Q_ASSERT(m_program_p3.link());
 
     // load model
-    m_gimbal_a = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/gimbal_wood.jpg");
-    m_gimbal_b = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/gimbal_wood.jpg");
-    m_gimbal_c = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/gimbal_wood.jpg");
+    m_gimbal_a = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/red.png");
+    m_gimbal_b = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/green.png");
+    m_gimbal_c = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/blue.png");
 
     m_sphere = std::make_unique<Model>(":/models/sphere.obj", ":/textures/sample_texture.jpg");
 
@@ -47,8 +47,8 @@ void MyGLWidget::initializeGL()
                                         ":/textures/skybox_images/left.jpg",   // nx
                                         ":/textures/skybox_images/top.jpg",    // py
                                         ":/textures/skybox_images/bottom.jpg", // ny
-                                        ":/textures/skybox_images/front.jpg",  // pz
-                                        ":/textures/skybox_images/back.jpg");  // nz
+                                        ":/textures/skybox_images/back.jpg",  // pz
+                                        ":/textures/skybox_images/front.jpg");  // nz
 
     // set up transformations
     m_gimbal_a->scale({3.0f, 3.0f, 3.0f});
@@ -61,8 +61,6 @@ void MyGLWidget::initializeGL()
 void MyGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-
 
     QMatrix4x4 view;
 
@@ -85,7 +83,7 @@ void MyGLWidget::paintGL()
         auto ms = m_timer.elapsed();
 
         float rotationA = static_cast<double>(ms) / 100.0; // 10 degrees/s
-        float rotationB = static_cast<double>(ms) / 50.0; // 20 degrees/s
+        float rotationB = -(static_cast<double>(ms) / 50.0); // -20 degrees/s
         float rotationC = static_cast<double>(ms) / 33.0; // 30 degrees/s
 
         m_gimbal_a->set_rotation(rotationA, axis);

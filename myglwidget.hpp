@@ -42,8 +42,8 @@ private:
 
     bool m_perspective;
 
-    bool m_center;
-    bool m_auto_rotate;
+    bool m_center{false};
+    bool m_auto_rotate{false};
 
     double m_near;
     double m_far;

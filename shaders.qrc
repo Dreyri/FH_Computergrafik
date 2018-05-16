@@ -18,6 +18,9 @@
         <file>skybox_images/right.jpg</file>
         <file>skybox_images/top.jpg</file>
         <file>gimbal_wood.jpg</file>
+        <file>red.png</file>
+        <file>blue.png</file>
+        <file>green.png</file>
     </qresource>
     <qresource prefix="/models">
         <file>gimbal.obj</file>
