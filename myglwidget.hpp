@@ -13,6 +13,7 @@
 
 #include "model.hpp"
 #include "skybox.hpp"
+#include "transform.hpp"
 
 class MyGLWidget : public QOpenGLWidget, QOpenGLFunctions_3_3_Core
 {
@@ -27,11 +28,18 @@ private:
     std::unique_ptr<Model> m_gimbal_b;
     std::unique_ptr<Model> m_gimbal_c;
 
+    transform m_a_transform;
+    transform m_b_transform;
+    transform m_c_transform;
+
+    transform m_sphere_rotation;
+    transform m_sphere_transform;
+
     std::unique_ptr<Skybox> m_skybox;
 
     std::unique_ptr<Model> m_sphere;
 
-    QVector3D m_cameraPos{0.0f, 0.0f, -20.0f};
+    QVector3D m_cameraPos{0.0f, 0.0f, 20.0f};
 
     QOpenGLShaderProgram m_program_p3;
 

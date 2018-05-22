@@ -37,8 +37,8 @@ void MyGLWidget::initializeGL()
 
     // load model
     m_gimbal_a = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/red.png");
-    m_gimbal_b = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/green.png");
-    m_gimbal_c = std::make_unique<Model>(":/models/gimbal.obj", ":/textures/blue.png");
+    m_gimbal_b = std::make_unique<Model>(*m_gimbal_a, ":/textures/green.png");
+    m_gimbal_c = std::make_unique<Model>(*m_gimbal_a, ":/textures/blue.png");
 
     m_sphere = std::make_unique<Model>(":/models/sphere.obj", ":/textures/sample_texture.jpg");
 
@@ -51,9 +51,18 @@ void MyGLWidget::initializeGL()
                                         ":/textures/skybox_images/front.jpg");  // nz
 
     // set up transformations
-    m_gimbal_a->scale({3.0f, 3.0f, 3.0f});
-    m_gimbal_b->scale({9.0f, 9.0f, 9.0f});
-    m_gimbal_c->scale({15.0f, 15.0f, 15.0f});
+    m_a_transform.set_scale(0.5f);
+    m_b_transform.set_scale(0.5f);
+    m_c_transform.set_scale(10.f);
+
+    m_a_transform.set_parent(&m_b_transform);
+    m_b_transform.set_parent(&m_c_transform);
+
+    m_sphere_transform.move({0.0f, 5.f, 0.0f});
+    m_sphere_transform.scale(0.15f);
+
+    m_sphere_rotation.set_parent(&m_b_transform);
+    m_sphere_transform.set_parent(&m_sphere_rotation);
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -66,49 +75,33 @@ void MyGLWidget::paintGL()
 
     // if centered checkbox clicked
     if (m_center) {
-        view = m_gimbal_a->transformation().inverted();
+        view = m_a_transform.transformation_matrix().inverted();
     }
     else {
         view.translate(m_cameraPos);
-        //view = view.inverted();
+        view = view.inverted();
     }
 
-    QVector3D axis{0.0f, 1.0f, 0.0f};
-    QMatrix4x4 sphere_transform;
-
+    static qint64 old_time = 0;
     auto elapsed_ms = m_timer.elapsed();
-
-    float sphere_rotation = static_cast<float>(elapsed_ms) / 20.0f;
-    m_sphere->rotate(sphere_rotation, {1.0f, 0.0f, 0.0f});
-
-
-    // if auto rotation checkbox clicked
-    // this is handled a bit ugly but this praktikum is almost done
-    // so maybe clean up for the next one
-    if (m_auto_rotate) {
-        auto ms = m_timer.elapsed();
-
-        float rotationA = static_cast<double>(ms) / 100.0; // 10 degrees/s
-        float rotationB = -(static_cast<double>(ms) / 50.0); // -20 degrees/s
-        float rotationC = static_cast<double>(ms) / 33.0; // 30 degrees/s
-
-        m_gimbal_a->set_rotation(rotationA, axis);
-        m_gimbal_b->set_rotation(rotationB, axis);
-        m_gimbal_c->set_rotation(rotationC, axis);
-
-        sphere_transform.rotate(rotationB, QVector3D(0.0f, 1.0f, 0.0f));
-        sphere_transform.rotate(m_angle, QVector3D(0.0f, 0.0f, 1.0f));
-        sphere_transform.translate(0.0f, 11.0f, 0.0f);
+    if (!m_auto_rotate) {
+        m_a_transform.set_rotation(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, m_rotationA));
+        m_b_transform.set_rotation(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, m_rotationB));
+        m_c_transform.set_rotation(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, m_rotationC));
     }
     else {
-        m_gimbal_a->set_rotation(m_rotationA, axis);
-        m_gimbal_b->set_rotation(m_rotationB, axis);
-        m_gimbal_c->set_rotation(m_rotationC, axis);
+        float degree_sec = 40.0f;
+        auto dt = (static_cast<float>(elapsed_ms) - static_cast<float>(old_time)) / 1000.0f;
 
-        sphere_transform.rotate(m_rotationB, QVector3D(0.0f, 1.0f, 0.0f));
-        sphere_transform.rotate(m_angle, QVector3D(0.0f, 0.0f, 1.0f));
-        sphere_transform.translate(0.0f, 11.0f, 0.0f);
+        m_a_transform.rotate(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, dt * degree_sec));
+        m_b_transform.rotate(QQuaternion::fromAxisAndAngle({1.0f, 0.0f, 0.0f}, dt * degree_sec));
+        m_c_transform.rotate(QQuaternion::fromAxisAndAngle({1.0f, 1.0f, 1.0f}, dt * degree_sec));
+
+        m_sphere_rotation.rotate(QQuaternion::fromAxisAndAngle({0.0f, 0.0f, 1.0f}, dt * degree_sec));
+        m_sphere_transform.rotate(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, dt * 10.0f * degree_sec));
     }
+
+    old_time = elapsed_ms;
 
     // draw skybox first
     m_skybox->render(m_projection, view);
@@ -119,20 +112,22 @@ void MyGLWidget::paintGL()
     m_program_p3.setUniformValue(1, view);
     m_program_p3.setUniformValue(2, m_projection);
 
-    auto transform = m_gimbal_a->transformation();
-    m_program_p3.setUniformValue(0, transform);
-    m_gimbal_a->render(GL_TRIANGLES);
 
-    transform = m_gimbal_b->transformation();
-    m_program_p3.setUniformValue(0, transform);
-    m_gimbal_b->render(GL_TRIANGLES);
-
-    transform = m_gimbal_c->transformation();
+    auto transform = m_a_transform.transformation_matrix();
     m_program_p3.setUniformValue(0, transform);
     m_gimbal_c->render(GL_TRIANGLES);
 
-    transform = sphere_transform;
-    transform *= m_sphere->transformation();
+    transform = m_b_transform.transformation_matrix();
+    m_program_p3.setUniformValue(0, transform);
+    m_gimbal_b->render(GL_TRIANGLES);
+
+    transform = m_c_transform.transformation_matrix();
+    m_program_p3.setUniformValue(0, transform);
+    m_gimbal_a->render(GL_TRIANGLES);
+
+    //transform = sphere_transform;
+
+    transform = m_sphere_transform.transformation_matrix();
     //transform = m_sphere->transformation();
     //transform *= sphere_transform;
     m_program_p3.setUniformValue(0, transform);
@@ -166,12 +161,12 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
     {
     case Qt::Key_W:
     case Qt::Key_Up:
-        zMovement += increment;
+        zMovement -= increment;
         event->accept();
         break;
     case Qt::Key_S:
     case Qt::Key_Down:
-        zMovement -= increment;
+        zMovement += increment;
         event->accept();
         break;
     case Qt::Key_A:

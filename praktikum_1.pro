@@ -28,7 +28,8 @@ SOURCES += \
         mainwindow.cpp \
     myglwidget.cpp \
     model.cpp \
-    skybox.cpp
+    skybox.cpp \
+    transform.cpp
 
 HEADERS += \
         mainwindow.hpp \
@@ -36,7 +37,8 @@ HEADERS += \
     vertex.hpp \
     modelloader.h \
     model.hpp \
-    skybox.hpp
+    skybox.hpp \
+    transform.hpp
 
 FORMS += \
         mainwindow.ui

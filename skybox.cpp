@@ -112,7 +112,7 @@ void Skybox::render(const QMatrix4x4& projection, QMatrix4x4 view) {
 
     // get rid of translation bit
     view.setColumn(3, QVector4D(0.0f, 0.0f, 0.0f, 1.0f));
-    view.scale(10.0f);
+    view.scale(100.0f);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeTex);
