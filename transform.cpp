@@ -58,9 +58,10 @@ void transform::set_rotation(const QQuaternion& rotation) {
 QMatrix4x4 transform::transformation_matrix() const {
     QMatrix4x4 transformation;
 
-    transformation.scale(m_scale);
     transformation.translate(m_translation);
     transformation.rotate(m_rotation);
+    transformation.scale(m_scale);
+
 
     if (m_parent) {
         return m_parent->transformation_matrix() * transformation;

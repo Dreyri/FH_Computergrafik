@@ -51,15 +51,15 @@ void MyGLWidget::initializeGL()
                                         ":/textures/skybox_images/front.jpg");  // nz
 
     // set up transformations
-    m_a_transform.set_scale(0.5f);
-    m_b_transform.set_scale(0.5f);
+    m_a_transform.set_scale(0.8f);
+    m_b_transform.set_scale(0.8f);
     m_c_transform.set_scale(10.f);
 
     m_a_transform.set_parent(&m_b_transform);
     m_b_transform.set_parent(&m_c_transform);
 
-    m_sphere_transform.move({0.0f, 5.f, 0.0f});
-    m_sphere_transform.scale(0.15f);
+    m_sphere_transform.move({0.0f, 1.f, 0.2f});
+    m_sphere_transform.scale(0.075f);
 
     m_sphere_rotation.set_parent(&m_b_transform);
     m_sphere_transform.set_parent(&m_sphere_rotation);
@@ -84,22 +84,25 @@ void MyGLWidget::paintGL()
 
     static qint64 old_time = 0;
     auto elapsed_ms = m_timer.elapsed();
+    float degree_sec = 40.0f;
+    auto dt = (static_cast<float>(elapsed_ms) - static_cast<float>(old_time)) / 1000.0f;
+
     if (!m_auto_rotate) {
         m_a_transform.set_rotation(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, m_rotationA));
-        m_b_transform.set_rotation(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, m_rotationB));
+        m_b_transform.set_rotation(QQuaternion::fromAxisAndAngle({1.0f, 0.0f, 0.0f}, m_rotationB));
         m_c_transform.set_rotation(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, m_rotationC));
     }
     else {
-        float degree_sec = 40.0f;
-        auto dt = (static_cast<float>(elapsed_ms) - static_cast<float>(old_time)) / 1000.0f;
 
         m_a_transform.rotate(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, dt * degree_sec));
         m_b_transform.rotate(QQuaternion::fromAxisAndAngle({1.0f, 0.0f, 0.0f}, dt * degree_sec));
-        m_c_transform.rotate(QQuaternion::fromAxisAndAngle({1.0f, 1.0f, 1.0f}, dt * degree_sec));
+        m_c_transform.rotate(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, dt * degree_sec));
 
-        m_sphere_rotation.rotate(QQuaternion::fromAxisAndAngle({0.0f, 0.0f, 1.0f}, dt * degree_sec));
-        m_sphere_transform.rotate(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, dt * 10.0f * degree_sec));
+
     }
+
+    m_sphere_rotation.rotate(QQuaternion::fromAxisAndAngle({0.0f, 0.0f, 1.0f}, dt * degree_sec));
+    m_sphere_transform.rotate(QQuaternion::fromAxisAndAngle({0.0f, 1.0f, 0.0f}, dt * -10.0f * degree_sec));
 
     old_time = elapsed_ms;
 
@@ -145,9 +148,22 @@ void MyGLWidget::setupProjection() {
     float aspect_ratio = static_cast<float>(width()) / static_cast<float>(height());
     QMatrix4x4 projection;
 
-    projection.perspective(m_fov, aspect_ratio, m_near, m_far);
-    m_projection = projection;
-    qDebug() << "projection matrix is now " << m_projection;
+    if (m_perspective) {
+
+        projection.perspective(m_fov, aspect_ratio, m_near, m_far);
+        m_projection = projection;
+        qDebug() << "using perspective";
+    }
+    else {
+        float win_width = static_cast<float>(width()) * 0.1f;
+        float win_height = static_cast<float>(height()) * 0.1f;
+
+        projection.ortho(-win_width*0.5f, win_width*0.5f, -win_height*0.5f, win_height*0.5f, m_near, m_far);
+        m_projection = projection;
+        qDebug() << "using orthogonal";
+    }
+    qDebug() << "projection matrix is now" << m_projection;
+
 }
 
 void MyGLWidget::keyPressEvent(QKeyEvent* event)
@@ -217,6 +233,7 @@ void MyGLWidget::setProjectionMode(bool perspective)
 {
     m_perspective = perspective;
     qDebug() << "Perspective " << (perspective ? "enabled" : "disabled");
+    setupProjection();
 }
 
 void MyGLWidget::setNear(double val)
